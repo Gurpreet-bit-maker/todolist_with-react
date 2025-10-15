@@ -82,11 +82,11 @@ export default function Tasklist() {
           return (
             <div key={i} className="">
               {items.comp ? (
-                <div>
-                  <p className="bg-red-500 text-white px-1 border-gray-700 border-1 mt-1 relative p-1 w-full">
+                <div className="">
+                  <p className="bg-yellow-500 text-black px-1   mt-1 relative p-1 w-full ">
                     {items.task}
                     <button
-                      className="border-1 absolute right-22 text-gray-400 bg-white rounded px-1 text-sm pt-1"
+                      className=" absolute right-22 text-gray-400 bg-white rounded px-1 text-sm pt-1"
                       onClick={() => deleteTask(i)}
                     >
                       Delete
@@ -94,7 +94,7 @@ export default function Tasklist() {
 
                     <button
                       onClick={() => complatedTaskFunc(i)}
-                      className="border-1 absolute right-0  text-blue-500 font-bold bg-white rounded px-1  text-sm pt-1 w-20"
+                      className=" absolute right-1  text-blue-500 font-bold bg-white rounded px-1  text-sm pt-1 w-20"
                     >
                       Complated
                     </button>
@@ -102,7 +102,7 @@ export default function Tasklist() {
                 </div>
               ) : (
                 <div>
-                  <p className="bg-gray-300 text-gray-700 px-1 border-gray-700 border-1 mt-1 relative p-1">
+                  <p className="bg-gray-300 text-gray-700 px-1 border-gray-700 border-1 mt-1 relative p-1 ">
                     {items.task}
                     <button
                       className="border-1 absolute right-27  bg-white rounded px-1 text-sm pt-1"
@@ -112,7 +112,7 @@ export default function Tasklist() {
                     </button>
                     <button
                       onClick={() => complatedTaskFunc(i)}
-                      className="border-1 absolute right-0  bg-white rounded px-1  text-sm pt-1  w-25"
+                      className="border-1 absolute right-1  bg-white rounded px-1  text-sm pt-1  w-25"
                     >
                       Do complate
                     </button>
