@@ -1,135 +1,177 @@
-import { useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import Searchcop from "./Searchcop";
 import { useEffect } from "react";
+import axios from "axios";
 
-export default function Tasklist() {
-  let [inpValue, setInpValue] = useState("");
-  let [description, setDescription] = useState("");
-  let [taskObj, settaskObj] = useState([]);
-  // let [complated,setcomplated] = useState(false);
-  let addedTask = async () => {
-    if (inpValue.trim() !== "") {
-      settaskObj([
-        ...taskObj,
-        { task: inpValue, des: description, comp: false },
-      ]);
-      setInpValue("");
-      setDescription("");
-    }
+export default function Tasklist({ taskObj, setTaskFunc }) {
+  //? All status
+  let [refresh, setrefresh] = useState(false);
+  let [del, setdelRef] = useState(false);
+  let [textPress, setTextPress] = useState(false);
+  let [taskText, setTaskText] = useState("");
+  let [taskdes, setTaskdes] = useState("");
+  let reTaskInput = useRef(null);
 
+  //* fetch data task from db
+  let userFetch = async () => {
     try {
-      await fetch(`http://localhost:5000/add`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(taskObj),
-      });
+      let url = await axios.get("http://localhost:5000/users");
+      if (!url) {
+        throw new Error("not found anyTask");
+      }
+      setTaskFunc(url.data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  console.log(taskObj);
 
-      if (!res.ok) {
-        throw new Error("Failed to submit");
+  //* complated Task
+  let update = async (index) => {
+    try {
+      let id = await axios.get("http://localhost:5000/users");
+      if (!id) {
+        throw new Error("not found any id of array of obj");
+      }
+      let users = id.data;
+      let singleTask = users[index];
+      let updatedTask = { ...singleTask, comp: !singleTask.comp };
+
+      //* put api call
+      let url = await axios.put(
+        `http://localhost:5000/users/${singleTask._id}`,
+        updatedTask
+      );
+      setrefresh(!refresh);
+      console.log(url);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  //* api call for delete task
+  let deleteTask = async (index) => {
+    try {
+      let id = await axios.get("http://localhost:5000/users");
+      if (!id) {
+        throw new Error("not found any id of array of obj");
+      }
+      let users = id.data;
+      let singleTask = users[index];
+      await axios.delete(`http://localhost:5000/users/${singleTask._id}`);
+
+      setdelRef(!del);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  let pressUpdation = async (index) => {
+    try {
+      let id = await axios.get("http://localhost:5000/users");
+      if (!id) {
+        throw new Error("not found any id of array of obj");
+      }
+      let users = id.data;
+      let singleTask = users[index];
+      setTextPress(!textPress);
+
+      if (textPress) {
+        let newTask = { ...singleTask, task: taskText };
+        let response = await axios.put(
+          `http://localhost:5000/users/${singleTask._id}`,
+          newTask
+        );
       }
     } catch (error) {
       console.log(error);
     }
   };
 
-  // useEffect(async() =>
-  // {
-  // try {
-  //       await fetch(`http://localhost:5000/add`, {
-  //         method: "POST",
-  //         headers: { "Content-Type": "application/json" },
-  //         body: JSON.stringify(taskObj),
-  //       });
+  useEffect(() => {
+    userFetch();
+  }, [refresh, del, textPress]);
 
-  //       if (!res.ok) {
-  //         throw new Error("Failed to submit");
-  //       }
-
-  //     } catch (error) {
-  //       console.log(error);
-  //     }
-  //   }
-  // ,[addedTask])
-
-  // *deleteTask function
-  let deleteTask = (index) => {
-    let delT = taskObj.filter((_, i) => i !== index);
-    settaskObj(delT);
-  };
-  //* complated task
-  let complatedTaskFunc = (index) => {
-    settaskObj(
-      taskObj.map((items, i) =>
-        i == index ? { ...items, comp: !items.comp } : items
-      )
-    );
-  };
-  console.log(taskObj);
   return (
-    <div className="flex justify-start items-center h-[100vh]">
-      <div className="border-red-500 border-2 w-1/3 p-10 ">
-        {/* search bar and btn */}
-        <Searchcop
-          addBtn={addedTask}
-          inpValue={inpValue}
-          setfun={setInpValue}
-          setDes={setDescription}
-          desValue={description}
-        />
+    <>
+      {taskObj.map((items, index) => {
+        return (
+          <div key={index} className="border-2 p-1 mt-1">
+            {textPress ? (
+              <div className="">
+                {/* <p className="text-white ">Task : {items.task}</p> */}
+                <span className="flex items-center justify-between">
+                  <input
+                    type="text"
+                    placeholder="enter text"
+                    onChange={(event) => setTaskText(event.target.value)}
+                    value={taskText}
+                    className="border-1 w-25"
+                  />
+                  <button
+                    onClick={() => pressUpdation(index)}
+                    className="bg-orange-300 text-white border-1 hover:bg-blue-500 hover:text-white rounded-lg px-2"
+                  >
+                    UpdateTask
+                  </button>
+                  {items.comp ? (
+                    <i
+                      onClick={() => update(index)}
+                      className="text-lg  hover:text-black text-yellow-300 fa-solid fa-circle-check"
+                    ></i>
+                  ) : (
+                    <i
+                      onClick={() => update(index)}
+                      className="text-sm  hover:text-black  fa-solid fa-circle-check"
+                    ></i>
+                  )}
 
-        {/* tasks list */}
-        {taskObj.map((items, i) => {
-          return (
-            <div key={i} className="">
-              {items.comp ? (
-                <div className="">
-                  <p className="bg-yellow-500 text-black px-1   mt-1 relative p-1 w-full ">
-                    {items.task}
-                    <button
-                      className=" absolute right-22 text-gray-400 bg-white rounded px-1 text-sm pt-1"
-                      onClick={() => deleteTask(i)}
-                    >
-                      Delete
-                    </button>
+                  <i
+                    onClick={() => deleteTask(index)}
+                    className="text-lg hover:text-black fa-solid fa-trash"
+                  ></i>
+                </span>
 
-                    <button
-                      onClick={() => complatedTaskFunc(i)}
-                      className=" absolute right-1  text-blue-500 font-bold bg-white rounded px-1  text-sm pt-1 w-20"
-                    >
-                      Complated
-                    </button>
-                  </p>{" "}
-                </div>
-              ) : (
-                <div>
-                  <p className="bg-gray-300 text-gray-700 px-1 border-gray-700 border-1 mt-1 relative p-1 ">
-                    {items.task}
-                    <button
-                      className="border-1 absolute right-27  bg-white rounded px-1 text-sm pt-1"
-                      onClick={() => deleteTask(i)}
-                    >
-                      Delete
-                    </button>
-                    <button
-                      onClick={() => complatedTaskFunc(i)}
-                      className="border-1 absolute right-1  bg-white rounded px-1  text-sm pt-1  w-25"
-                    >
-                      Do complate
-                    </button>
+                <p className="text-orange-200"> Description : {items.des} </p>
+              </div>
+            ) : (
+              <div className="">
+                <div className="flex gap-20">
+                  <p className="text-white flex items-center justify-between">
+                    Task : {items.task}
                   </p>
-                  <p className="bg-gray-300 text-yellow-500 px-1 border-gray-700 border-1 mt-1 relative p-1">
-                    {" "}
-                    Description :{" "}
-                    <span className="text-blue-600">{items.des}</span>
-                  </p>
+                  <span className="flex items-center justify-between">
+                    <button
+                      onClick={() => pressUpdation(index)}
+                      className="bg-orange-300 text-sm text-white border-1 hover:bg-blue-500 hover:text-white rounded-lg px-2 w-20"
+                    >
+                      Re-write
+                    </button>
+                    {items.comp ? (
+                      <i
+                        onClick={() => update(index)}
+                        className="text-lg  hover:text-black text-yellow-300 fa-solid fa-circle-check"
+                      ></i>
+                    ) : (
+                      <i
+                        onClick={() => update(index)}
+                        className="text-sm  hover:text-black  fa-solid fa-circle-check"
+                      ></i>
+                    )}
+
+                    <i
+                      onClick={() => deleteTask(index)}
+                      className="text-lg hover:text-black fa-solid fa-trash"
+                    ></i>
+                  </span>
                 </div>
-              )}
-            </div>
-          );
-        })}
-      </div>
-    </div>
+
+                <p className="text-orange-200"> Description : {items.des} </p>
+              </div>
+            )}
+          </div>
+        );
+      })}
+    </>
   );
 }
-
-// module.exports = taskObj;
