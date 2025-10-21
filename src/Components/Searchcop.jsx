@@ -28,7 +28,7 @@ export default function Searchcop() {
 
   // console.log(taskObj);
   return (
-    <div className="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 p-1 w-80 m-5">
+    <div className="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 p-1 w-80 m-5 shadow-2xl rounded-lg" >
       <h1 className="text-2xl font-bold text-center mb-5 tracking-wider">
         TODO LIST
       </h1>
