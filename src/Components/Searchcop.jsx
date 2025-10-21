@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import Tasklist from "./Tasklist";
 import axios from "axios";
+import boyimg from "../../public/cartoon.png";
 
 export default function Searchcop() {
   let [titleValue, setTitleValue] = useState("");
@@ -25,10 +26,10 @@ export default function Searchcop() {
     }
   };
 
-
   // console.log(taskObj);
   return (
-    <div className="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 p-1 w-80 m-5 shadow-2xl rounded-lg" >
+    <div className="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 p-1 w-80 m-5 shadow-2xl rounded-lg">
+    <img src={boyimg} alt="" />
       <h1 className="text-2xl font-bold text-center mb-5 tracking-wider">
         TODO LIST
       </h1>
